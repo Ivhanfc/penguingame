@@ -14,7 +14,7 @@ const io = new Server(server, {
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Objeto global de jugadores
@@ -43,14 +43,14 @@ io.on('connection', (socket) => {
     flipX: players[socket.id].flipX
 
   });
-socket.on("penguinJoin", (data) => {
-        
-        // lógica interna de sincronización
-        players.push(data);
+  socket.on("penguinJoin", (data) => {
 
-        // Notifica a TODOS los que están conectados
-        io.emit("syncPenguins", players);
-    });
+    // lógica interna de sincronización
+    players.push(data);
+
+    // Notifica a TODOS los que están conectados
+    io.emit("syncPenguins", players);
+  });
   // Recibir movimiento del cliente
   socket.on('playerMovement', (data) => {
     if (!players[socket.id]) return;
@@ -69,21 +69,21 @@ socket.on("penguinJoin", (data) => {
       state: players[socket.id].state,
       flipX: players[socket.id].flipX
     });
- 
 
- });
+
+  });
   // Desconexión
   socket.on('disconnect', () => {
     console.log('Jugador desconectado:', socket.id);
     delete players[socket.id];
     socket.broadcast.emit('playerDisconnected', socket.id);
   });
-socket.on("ChatMessage", (msg) => {
+  socket.on("ChatMessage", (msg) => {
     io.emit("ChatMessage", {
-        id: socket.id,
-        msgS: msg
+      id: socket.id,
+      msgS: msg
     });
- });  
+  });
 });
 
 
