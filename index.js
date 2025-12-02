@@ -10,10 +10,10 @@ const io = new Server(server, {
   cors: { origin: "*" }
 });
 // Servir archivos estáticos desde frontend
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, './frontend')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  res.sendFile(path.join(__dirname, './frontend/index.html'));
 });
 
 // Objeto global de jugadores
