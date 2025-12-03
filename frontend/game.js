@@ -1,6 +1,6 @@
 const socket = io();
 const DataManager = Phaser.Data.DataManager;
-
+let chatActive = false;
 let scene;
 let penguin;
 let arrows;
@@ -137,28 +137,44 @@ function create() {
   });
 
   const msg = document.getElementById("message");
-  const sendbtn = document.getElementById("SendMessage");
   const chatBox = document.getElementById("Chat");
+  msg.addEventListener('focus', () => {
+    chatActive = true;
+    scene.input.keyboard.enabled = false;
+  });
+  msg.addEventListener('blur', () => {
+    chatActive = false;
+    scene.input.keyboard.enabled = true;
+  });
 
-
+  document.addEventListener('keydown', (event) => {
+    if (chatActive && event.key === "Space") {
+      event.preventDefault();
+      msg.value += " ";
+    }
+  });
   // Evitar listeners duplicados
   socket.removeAllListeners("ChatMessage");
-
-  sendbtn.addEventListener("click", () => {
-
-    if (msg.value !== "") {
+  msg.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && msg.value.trim() !== "") {
+      event.preventDefault();
       console.log(msg.value);
       socket.emit("ChatMessage", {
         msg: msg.value
       });
+      msg.value = "";
+      msg.blur();
     }
+
+
   });
 
   socket.on("ChatMessage", (data) => {
     const msgDiv = document.createElement("div");
-    const userT = JSON.stringify(data.id);
-    const msgT = JSON.stringify(data.msgS);
-    msgDiv.textContent = `${userT}: ${msgT}`;
+
+    msgDiv.textContent = `${data.id}: ${data.msgS.msg}`;
+    msgDiv.style.color = "black";
+    msgDiv.style.fontFamily = "comic sans ms";
     chatBox.appendChild(msgDiv);
   });
 }
@@ -166,7 +182,10 @@ function create() {
 
 function update(time, delta) {
   const velX = penguin.body.velocity.x;
-
+  if (chatActive) {
+    penguin.setVelocityX(0);
+    return; // Sale de la función update, ignorando el resto de la lógica de movimiento
+  }
   // Movimiento horizontal
   if (arrows.left.isDown) {
     penguin.setVelocityX(-100);
