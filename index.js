@@ -77,10 +77,10 @@ io.on('connection', (socket) => {
     delete players[socket.id];
     socket.broadcast.emit('playerDisconnected', socket.id);
   });
-  socket.on("ChatMessage", (msg) => {
+  socket.on("ChatMessage", (data) => {
     io.emit("ChatMessage", {
       id: socket.id,
-      msgS: msg
+      msg: data.msg
     });
   });
 });
