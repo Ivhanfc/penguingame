@@ -32,9 +32,6 @@ const config = {
 
 new Phaser.Game(config);
 
-// --------------------------------------------------
-// PRELOAD
-// --------------------------------------------------
 function preload() {
   this.load.spritesheet('penguin', 'images/penguin-sprite.png', {
     frameWidth: 32,
@@ -50,9 +47,6 @@ socket.on("randomChunk", (data) => {
 
 
 });
-// --------------------------------------------------
-// CREATE
-// --------------------------------------------------
 function create() {
   scene = this;
   platforms = scene.physics.add.staticGroup();

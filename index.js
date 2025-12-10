@@ -50,7 +50,8 @@ io.on('connection', (socket) => {
   socket.on("penguinJoin", (data) => {
 
     // lógica interna de sincronización
-    players[socket.id] = data;
+    players.push(data);
+
     // Notifica a TODOS los que están conectados
     io.emit("syncPenguins", players);
   });
