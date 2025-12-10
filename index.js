@@ -9,6 +9,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" }
 });
+io.sockets.setMaxListeners(0);
+
 // Servir archivos estáticos desde frontend
 app.use(express.static(path.join(__dirname, './frontend')));
 
@@ -19,9 +21,12 @@ app.get('/', (req, res) => {
 // Objeto global de jugadores
 const players = {};
 
+seedR = Math.floor(Math.random() * 10);
+console.log(seedR);
 io.on('connection', (socket) => {
   console.log('Jugador conectado:', socket.id);
 
+  socket.emit('randomChunk', { seedR });
   // Posición inicial (puedes randomizar o poner en un spawn seguro)
   players[socket.id] = {
     x: 200 + Math.random() * 200,
@@ -45,8 +50,7 @@ io.on('connection', (socket) => {
   socket.on("penguinJoin", (data) => {
 
     // lógica interna de sincronización
-    players.push(data);
-
+    players[socket.id] = data;
     // Notifica a TODOS los que están conectados
     io.emit("syncPenguins", players);
   });
@@ -69,6 +73,14 @@ io.on('connection', (socket) => {
       flipX: players[socket.id].flipX
     });
 
+  });
+  socket.on("shoot", data => {
+    socket.broadcast.emit("playerShoot", {
+      id: socket.id,
+      x: data.x,
+      y: data.y,
+      dir: data.dir
+    });
 
   });
   // Desconexión
